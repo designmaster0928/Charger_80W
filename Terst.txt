@@ -1,0 +1,637 @@
+/* Includes ------------------------------------------------------------------*/
+#include "stm8s_conf.h"
+#include "stm8s_tim1.h"
+#include "stm8s_clk.h"
+#include "delay.h"
+
+/* Private defines -----------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
+
+//POD IDs for Radios
+//unsigned char dataEEPROM_CP185_CP100D[24]      = {0x3F, 0x06, 0x03, 0x01, 0x01, 0xEB, 0x09, 0xC4, 0x02, 0x58, 0x01, 0x7E, 0x00, 0x99, 0x01, 0x33, 0x00, 0x4C, 0x01, 0x55, 0x46, 0x50, 0x7C, 0xA7};
+//unsigned char dataEEPROM_XP3300TRBO[24]        = {0x3E, 0x06, 0x02, 0x01, 0x01, 0xEB, 0x09, 0xC4, 0x02, 0x3D, 0x01, 0x7E, 0x00, 0x99, 0x01, 0x33, 0x00, 0x4C, 0x01, 0x55, 0x46, 0x50, 0x13, 0xBA};
+//unsigned char dataEEPROM_CP200[24]             = {0x3D, 0x06, 0x01, 0x00, 0x01, 0xEB, 0x09, 0xC4, 0x02, 0x66, 0x01, 0x7E, 0x00, 0x99, 0x01, 0x33, 0x00, 0x4C, 0x01, 0x55, 0x46, 0x50, 0xAD, 0x83};
+//unsigned char dataEEPROM_KW_NX1000[24]         = {0x47, 0x07, 0x01, 0x01, 0x01, 0xEB, 0x07, 0xD0, 0x02, 0x58, 0x01, 0x7E, 0x00, 0x99, 0x01, 0x33, 0x00, 0x4C, 0x01, 0x55, 0x38, 0x40, 0xA3, 0x44};
+//unsigned char dataEEPROM_GO[24]                = {0x29, 0x04, 0x01, 0x01, 0x01, 0xEB, 0x07, 0xD0, 0x02, 0x3D, 0x01, 0x7E, 0x00, 0x99, 0x01, 0x33, 0x00, 0x4C, 0x01, 0x55, 0x54, 0x60, 0x0D, 0x89};
+//
+////POD IDs for Phones
+//unsigned char dataEEPROM_XP5Plus[24]           = {0x0E, 0x01, 0x02, 0xFF, 0x00, 0xF5, 0x0D, 0xAC, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x5C, 0x01, 0x55, 0x54, 0x60, 0x8A, 0x02};
+//unsigned char dataEEPROM_XP10[24]              = {0x0F, 0x01, 0x02, 0x02, 0x00, 0xF5, 0x13, 0x88, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x7A, 0x01, 0x62, 0x54, 0x60, 0x96, 0x4C};
+//unsigned char dataEEPROM_Orion_ros[24]         = {0x1F, 0x03, 0x01, 0x02, 0x00, 0xF5, 0x06, 0x40, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x7A, 0x01, 0x55, 0x54, 0x60, 0xDC, 0x85};
+//unsigned char dataEEPROM_Samsung[24]           = {0x15, 0x02, 0x01, 0x02, 0x00, 0xF5, 0x0F, 0xA0, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x2E, 0x02, 0x44, 0x2A, 0x30, 0xD4, 0xD6};
+//unsigned char dataEEPROM_XP3[24]               = {0x0D, 0x01, 0x03, 0x02, 0x00, 0xF5, 0x07, 0x08, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x4C, 0x01, 0x55, 0x54, 0x60, 0x0E, 0xDB};
+//unsigned char dataEEPROM_XP5s[24]              = {0x0C, 0x01, 0x02, 0x02, 0x00, 0xF5, 0x07, 0x08, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x5C, 0x01, 0x55, 0x54, 0x60, 0x52, 0xEA};
+//unsigned char dataEEPROM_XP8[24]               = {0x0B, 0x01, 0x01, 0x02, 0x00, 0xF5, 0x0F, 0xA0, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x5A, 0x01, 0x55, 0xA8, 0xC0, 0xCC, 0x13};
+//unsigned char dataEEPROM_New_XP5[24]           = {0x0E, 0x01, 0x02, 0x02, 0x00, 0xF5, 0x07, 0x08, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x5C, 0x01, 0x99, 0x54, 0x60, 0xDA, 0xCC};
+//unsigned char dataEEPROM_Samsung_XCP[24]       = {0x16, 0x02, 0x02, 0x02, 0x00, 0xF5, 0x0F, 0xD2, 0x01, 0x1E, 0x00, 0xBF, 0x00, 0x99, 0x01, 0x33, 0x00, 0x49, 0x01, 0xBB, 0x2A, 0x30, 0xA2, 0x92};
+
+#define PWM_DUTY_CNT    6000
+
+#define PWM_DUTY_NONE           0
+
+#define SPI_PORT        GPIOC
+#define SPI_CS          GPIO_PIN_2
+#define SPI_SCL         GPIO_PIN_5
+#define SPI_MOSI        GPIO_PIN_6
+#define SPI_MISO        GPIO_PIN_7        
+
+#define OVER_VOLTAGE_ADDRESS   8
+#define UNDER_VOLTAGE_ADDRESS  10
+#define CHARGE_CURRENT_ADDRESS 14
+#define STOP_CURRENT_ADDRESS   16
+#define OVER_VOLTAGE1_ADDRESS  18
+
+#define CHECKED    1
+#define UNCHECKED  0
+
+#define COUNT_LIMIT                 1000
+#define COUNT_LIMIT_FULLCHARGED     5000
+
+enum SYSTEM_STATE {
+    FULL_CHARGED = 0,
+    CHARGING,
+    DISCONNECTED
+};
+
+uint16_t valTemp   = 0; 
+uint16_t valVBat   = 0;
+uint16_t valISense = 0;
+
+uint16_t overValVBat   = 0;
+uint16_t overValVBat1  = 0;
+uint16_t underValVBat  = 0;
+uint16_t upLimitValVBat= 0;
+uint16_t initChgValCur = 0;
+uint16_t initChgValCur1= 0;
+uint16_t stopChgValCur = 0;
+uint16_t downLimitValCur = 0;
+uint8_t  stepValVBat  = 0;
+uint16_t batteryCheckCnt = 0;
+uint16_t batteryCheckCnt1 = 0;
+
+uint16_t timer2Count = 0;
+uint8_t  timer2Flag  = 0;
+uint16_t transientCnt = 0;
+uint16_t dutyUpdateCnt = 0;
+uint8_t  dutySetValue  = 0;
+
+uint8_t mobileSubBoardType = 0;
+uint16_t pwmDuty = PWM_DUTY_NONE;
+uint16_t fullChagePwmDuty = PWM_DUTY_NONE;
+
+uint8_t isBatteryCheckFlg = 0;
+uint8_t transientCheckFlg = 0;
+uint8_t chargingModeFlg = 0;
+
+static void CLK_Config(void)
+{
+    CLK_DeInit();
+    CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV1);      //f_Master = HSI/1 = 16MHz
+    CLK_SYSCLKConfig(CLK_PRESCALER_CPUDIV1);            //f_CPU = f_Master/1 = 16MHz
+    while(CLK_GetFlagStatus(CLK_FLAG_HSIRDY)!=SET);     //wait until HSI ready
+}
+
+static void delay_ns(unsigned int nano)
+{
+    volatile unsigned int count = nano;
+    while (count--)
+        asm("nop");               //62.5nS : 16MHz
+}
+
+void SPI_Config(void)
+{
+  GPIO_Init(GPIOA, GPIO_PIN_2, GPIO_MODE_OUT_PP_LOW_FAST);              // PC4 : SPI_CS
+  GPIO_WriteLow(GPIOA, GPIO_PIN_2);   
+  GPIO_Init(GPIOC, GPIO_PIN_5, GPIO_MODE_OUT_PP_LOW_FAST);              // PC5 : SPI_SCK
+  GPIO_WriteLow(GPIOC, GPIO_PIN_5); 
+  GPIO_Init(GPIOC, GPIO_PIN_6, GPIO_MODE_OUT_PP_LOW_FAST);              // PC6 : SPI_MOSI
+  GPIO_WriteLow(GPIOC, GPIO_PIN_6); 
+  GPIO_Init(GPIOC, GPIO_PIN_7, GPIO_MODE_IN_FL_IT);                     // PC7 : SPI_MISO
+}
+
+unsigned char SPI_Read(unsigned char address)
+{
+    unsigned char readValue = 0;
+    unsigned int  readReg = address;
+    readReg = 0x300 | readReg;
+    unsigned char readBit;
+    unsigned char i;
+    
+    GPIO_WriteLow(GPIOA, SPI_CS);   
+    GPIO_WriteLow(SPI_PORT, SPI_SCL);
+    GPIO_WriteLow(SPI_PORT, SPI_MOSI);    
+    delay_ns(10);         // 1.6MHz
+    
+    GPIO_WriteHigh(GPIOA, SPI_CS);
+    for (i = 0; i < 10; i++)
+    {
+        GPIO_WriteLow(SPI_PORT, SPI_SCL); 
+        delay_ns(10);         // 1.6MHz         
+        
+        if (readReg & 0x200)
+            GPIO_WriteHigh(SPI_PORT, SPI_MOSI);
+        else
+            GPIO_WriteLow(SPI_PORT, SPI_MOSI);
+        GPIO_WriteHigh(SPI_PORT, SPI_SCL);
+        delay_ns(10);         // 1.6MHz 
+        
+        readReg = readReg << 1;
+    }
+    
+    for (i = 0; i < 8; i++)
+    {      
+        readValue = readValue << 1;
+        GPIO_WriteLow(SPI_PORT, SPI_SCL); 
+        delay_ns(10);         // 1.6MHz 
+        GPIO_WriteHigh(SPI_PORT, SPI_SCL);
+        delay_ns(10);         // 1.6MHz 
+        readBit = GPIO_ReadInputPin(SPI_PORT, SPI_MISO);
+        if (readBit != 0)
+        {
+            readValue = readValue + 1;
+        }
+        else
+        {
+            readValue = readValue + 0;
+        }
+    }
+    
+    GPIO_WriteLow(SPI_PORT, SPI_SCL); 
+    delay_ns(10);         // 1.6MHz 
+    GPIO_WriteLow(GPIOA, SPI_CS);   
+    GPIO_WriteHigh(SPI_PORT, SPI_SCL);
+    delay_ns(10);         // 1.6MHz 
+    GPIO_WriteHigh(GPIOA, SPI_CS);   
+    GPIO_WriteLow(SPI_PORT, SPI_SCL);
+    
+    return readValue;
+}
+
+void ADC_Config(void)
+{
+    //Config GPIO for ADC1    
+    GPIO_Init(GPIOC, GPIO_PIN_4 , GPIO_MODE_IN_FL_NO_IT);   //PC4 AIN2 Channel 2
+    GPIO_Init(GPIOD, GPIO_PIN_2 , GPIO_MODE_IN_FL_NO_IT);   //PD2 AIN3 Channel 3
+    GPIO_Init(GPIOD, GPIO_PIN_3 , GPIO_MODE_IN_FL_NO_IT);   //PD3 AIN4 Channel 4
+    
+    /* Init ADC */
+    ADC1_DeInit();                                          //deinit first configuration of ADC
+  
+    ADC1_PrescalerConfig(ADC1_PRESSEL_FCPU_D2);
+    ADC1_ExternalTriggerConfig(ADC1_EXTTRIG_TIM,DISABLE);
+    ADC1_SchmittTriggerConfig(ADC1_SCHMITTTRIG_ALL,DISABLE);
+
+    ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE, 
+                        ADC1_CHANNEL_4, 
+                        ADC1_ALIGN_RIGHT);
+  
+    ADC1_ScanModeCmd(ENABLE);                                //enable scan mode
+    ADC1_Cmd(ENABLE);                                        //Turn on ADC1 the value will be store in ADC1_IRQHandler  
+}
+
+void AddBufferTemp(uint16_t temp)
+{  
+    valTemp = temp;
+}
+
+void AddBufferVoltage(uint16_t voltage)
+{  
+    valVBat = voltage;
+}
+
+void AddBufferCurrent(uint16_t current)
+{ 
+    valISense = current;
+}
+
+void UART_Config(void){
+    //PD5 UART TX
+    //PD6 Input of VSELï¿½ï¿½Not RX
+    UART1_DeInit();
+    UART1_Init((uint32_t)115200, 
+               UART1_WORDLENGTH_8D, 
+               UART1_STOPBITS_1, 
+               UART1_PARITY_NO,
+               UART1_SYNCMODE_CLOCK_DISABLE, 
+               UART1_MODE_TX_ENABLE | UART1_MODE_RX_DISABLE);
+}
+
+int putchar (char c)
+{
+    /* Write a character to the UART1 */
+    UART1_SendData8(c);
+    /* Loop until the end of transmission */
+    while (UART1_GetFlagStatus(UART1_FLAG_TXE) == RESET);
+
+    return (c);
+}
+
+void putstring(char* string)
+{
+    while(*string) // Het chuoi ky tu thi thoat
+    {
+        putchar(*string);
+        string ++; // Lay ky tu tiep theo
+    }
+    putchar(0);
+}
+
+void UartSendInt(unsigned int n)
+{
+    unsigned char buffer[16];
+    unsigned char i,j;
+
+    if(n == 0) {
+        putchar('0');
+        return;
+    }
+
+    for (i = 15; i > 0 && n > 0; i--) {
+        buffer[i] = (n%10)+'0';
+        n /= 10;
+    }
+
+    for(j = i+1; j <= 15; j++) {
+        putchar(buffer[j]);
+    }
+}
+
+void SetPwmDuty(uint8_t duty)
+{
+    pwmDuty = duty;
+    TIM1_SetCompare3(duty);
+    GPIO_WriteHigh(GPIOA, GPIO_PIN_1); // FD2204 Enable   
+}
+
+void ChargeValDetect()
+{
+    if( overValVBat > 280 && overValVBat < 310 ) 
+    { 
+        overValVBat = overValVBat1 * 11 / 10;
+        underValVBat = overValVBat * 2 / 3;
+        chargingModeFlg = 1;
+    }
+    else chargingModeFlg = 0;
+    upLimitValVBat = overValVBat + 14;
+    pwmDuty = (uint16_t)upLimitValVBat * 34 / 110;
+    initChgValCur1 = initChgValCur * 17 / 10;
+    SetPwmDuty( pwmDuty );
+    fullChagePwmDuty = pwmDuty;
+    downLimitValCur = (uint16_t)stopChgValCur / 10;//(uint16_t)stopChgValCur / 10;
+    stepValVBat = 3;//(uint16_t)4 * overValVBat / 577;
+}
+
+uint8_t CheckBattery(void)
+{
+    putstring( "\n Now Battery Detecting " );
+    overValVBat = SPI_Read(OVER_VOLTAGE_ADDRESS);
+    overValVBat   = overValVBat * 256 + SPI_Read(OVER_VOLTAGE_ADDRESS+1) + 3;
+    overValVBat1 = SPI_Read(OVER_VOLTAGE1_ADDRESS);
+    overValVBat1  = overValVBat1 * 256 + SPI_Read(OVER_VOLTAGE1_ADDRESS+1) + 3;
+    underValVBat = SPI_Read(UNDER_VOLTAGE_ADDRESS);
+    underValVBat  = underValVBat * 256 + SPI_Read(UNDER_VOLTAGE_ADDRESS+1);
+    initChgValCur = SPI_Read(CHARGE_CURRENT_ADDRESS);
+    initChgValCur = initChgValCur * 256 + SPI_Read(CHARGE_CURRENT_ADDRESS+1);
+    stopChgValCur = SPI_Read(STOP_CURRENT_ADDRESS);
+    stopChgValCur = stopChgValCur * 256 + SPI_Read(STOP_CURRENT_ADDRESS+1);
+    
+    if( overValVBat > 250 && overValVBat < 700 )
+    {
+        ChargeValDetect();
+        putstring( "\n Battery Detected " );  
+        putstring("\nOverV ");  UartSendInt(overValVBat);
+        putstring("\nUnderV "); UartSendInt(upLimitValVBat);
+        //putstring("\nInitI ");  UartSendInt(initChgValCur);
+        //putstring("\nStopI "); UartSendInt(stopChgValCur);
+        //putstring("\nStopI1 "); UartSendInt(pwmDuty);
+        //putstring("\nStopI2 "); UartSendInt(upLimitValVBat);
+        //putstring("\nStopI3 "); UartSendInt(downLimitValCur);
+        enableInterrupts();
+        return 1;
+    }
+    else 
+    {
+        disableInterrupts();
+        putstring( "\n Battery not Detected " );
+        return 0;
+    }
+}
+
+void SetPwmStop(void)
+{
+    pwmDuty = PWM_DUTY_NONE;
+    TIM1_SetCompare3(PWM_DUTY_NONE);                              
+    GPIO_WriteLow(GPIOA, GPIO_PIN_1); // FD2204 Disable
+}
+
+void main( void )
+{      
+    unsigned int repeatCount_1_2 = 0;
+    unsigned int repeatCount_1_3 = 0;
+    unsigned int repeatCount_1_3_2 = 0;
+    unsigned int repeatCount_2_1 = 0;
+    unsigned int repeatCount_2_3 = 0;
+    unsigned int repeatCount_3_1 = 0;
+    unsigned int repeatCount_3_2 = 0;
+    
+    enum SYSTEM_STATE systemState = DISCONNECTED;
+    
+    disableInterrupts();
+    CLK_Config();
+    
+    GPIO_DeInit(GPIOA); 
+    GPIO_DeInit(GPIOB); 
+    GPIO_DeInit(GPIOC);
+    GPIO_DeInit(GPIOD);
+    
+    // PIN1 : PD4
+    GPIO_Init(GPIOD, GPIO_PIN_4, GPIO_MODE_OUT_PP_LOW_FAST);    // PD4 : NTC PULL DOWN
+    GPIO_WriteLow(GPIOD, GPIO_PIN_4);  
+    
+    // Discharging control
+    GPIO_Init(GPIOA, GPIO_PIN_3 , GPIO_MODE_OUT_PP_LOW_FAST);   // FLOAT for Discharging module
+    GPIO_WriteLow(GPIOA, GPIO_PIN_3); // FLOAT Disable
+    
+    // Half-bridge control
+    GPIO_Init(GPIOA, GPIO_PIN_1 , GPIO_MODE_OUT_PP_LOW_FAST);   // FD2204 ENABLE PIN
+    GPIO_WriteLow(GPIOA, GPIO_PIN_1); // FD2204 Disable
+    
+    // PWM Control
+    GPIO_Init(GPIOC, GPIO_PIN_3 , GPIO_MODE_OUT_PP_LOW_FAST);   // FD2204 PWM IN
+    
+    CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, ENABLE);   
+    
+    // LED control
+     
+    GPIO_Init(GPIOB, GPIO_PIN_4 , GPIO_MODE_OUT_PP_LOW_FAST);   // Green LED PIN
+    GPIO_Init(GPIOB, GPIO_PIN_5 , GPIO_MODE_OUT_PP_LOW_FAST);   // RED LED PIN
+    GPIO_WriteHigh(GPIOB, GPIO_PIN_4);                          // Green LED OFF
+    GPIO_WriteHigh(GPIOB, GPIO_PIN_5);                          // RED   LED OFF
+    
+    delay_ms(200);
+    GPIO_WriteLow(GPIOB, GPIO_PIN_5);                          // RED   LED ON
+    delay_ms(1500);
+    GPIO_WriteHigh(GPIOB, GPIO_PIN_5);                          // RED   LED OFF
+    
+    SPI_Config();
+    UART_Config();        //PD5 UART TX
+    
+    TIM1_DeInit();    
+    
+    TIM1_TimeBaseInit(CLK_PRESCALER_HSIDIV1, TIM1_COUNTERMODE_UP, (16000 / 50), 0);
+    TIM1_OC3Init(TIM1_OCMODE_PWM1, TIM1_OUTPUTSTATE_ENABLE, TIM1_OUTPUTNSTATE_DISABLE,  pwmDuty, TIM1_OCPOLARITY_HIGH, TIM1_OCNPOLARITY_HIGH, TIM1_OCIDLESTATE_SET, TIM1_OCNIDLESTATE_RESET);
+    TIM1_OC3PreloadConfig(ENABLE);  
+    
+    TIM1_Cmd(ENABLE);
+    
+    TIM1_CtrlPWMOutputs(ENABLE);
+    TIM1_ARRPreloadConfig(ENABLE);
+    
+    TIM2_DeInit();        
+    TIM2_TimeBaseInit(CLK_PRESCALER_HSIDIV1, (16000 / 5));    
+    TIM2_ITConfig(TIM2_IT_UPDATE,ENABLE);
+    TIM2_Cmd(ENABLE);          
+    
+    //isBatteryCheckFlg = CheckBattery();
+    
+    ADC_Config();         //PD2 AIN3 VBat    PD3 AIN4 Isense
+    ADC1_Cmd(ENABLE);                           //Turn on ADC1 the value will be store in ADC1_IRQHandler
+    delay_ms(1500);
+   
+    //pwmDuty = 0;
+    //enableInterrupts();
+    
+  /* Infinite loop */
+    while (1)
+    {
+        
+        //if(  )batteryCheckCnt ++;
+        if( !isBatteryCheckFlg ) {
+            batteryCheckCnt ++;
+            if( batteryCheckCnt > 30000 ) {
+                batteryCheckCnt = 0;
+                isBatteryCheckFlg = CheckBattery();
+            }
+        }
+        
+        if (timer2Flag && isBatteryCheckFlg)         //5KHz Loop
+        {         
+            timer2Flag = 0; 
+            timer2Count++;
+            
+            ADC1_StartConversion();
+            while(!ADC1_GetFlagStatus(ADC1_FLAG_EOC));
+            ADC1_ClearFlag(ADC1_FLAG_EOC);
+            
+            AddBufferTemp(ADC1_GetBufferValue(2));
+            AddBufferVoltage(ADC1_GetBufferValue(3));
+            AddBufferCurrent(ADC1_GetBufferValue(4));
+            
+                       
+            //if( isBatteryCheckFlg ) {
+                switch(systemState)
+                {
+                    case FULL_CHARGED:
+                        
+                        GPIO_WriteLow(GPIOB, GPIO_PIN_4);                           // Green LED ON
+                        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);                          // RED   LED OFF
+                        
+                        if (pwmDuty != fullChagePwmDuty) SetPwmDuty(fullChagePwmDuty);
+                        if( !transientCheckFlg ) transientCnt ++;
+                        if( transientCnt > 60000 ) {transientCheckFlg = 1; transientCnt = 0;}
+                        if( transientCheckFlg ) {
+                            if ( valISense > downLimitValCur && valVBat < overValVBat - stepValVBat ) //valISense > 220 //valVBat < 565
+                            {   
+                                repeatCount_1_2++;
+                                if (repeatCount_1_2 > COUNT_LIMIT) {
+                                    repeatCount_1_2 = 0;
+                                    systemState = CHARGING;
+                                    transientCheckFlg = 0;
+                                }
+                            }
+                            else if ( valISense < downLimitValCur ) // && valTemp < 15
+                            {
+                                repeatCount_1_3_2++;
+                                if (mobileSubBoardType == 2 && repeatCount_1_3_2 > COUNT_LIMIT_FULLCHARGED) {
+                                    repeatCount_1_3_2 = 0;
+                                    systemState = DISCONNECTED;
+                                    transientCheckFlg = 0;
+                                    //isBatteryCheckFlg = 0;
+                                }
+                            }
+                            else
+                            {
+                                repeatCount_1_2 = 0;
+                                repeatCount_1_3 = 0;
+                                repeatCount_1_3_2 = 0;
+                            }
+                        }
+                        break;
+                        
+                    case CHARGING:
+                        GPIO_WriteHigh(GPIOB, GPIO_PIN_4);                          // Green LED OFF
+                        GPIO_WriteLow(GPIOB, GPIO_PIN_5);                           // RED   LED ON    
+                        if( !transientCheckFlg ) transientCnt ++;
+                        if( transientCnt > 60000 ) {transientCheckFlg = 1; transientCnt = 0;}
+                        if( transientCheckFlg ) {
+                            
+                            if ( valVBat > overValVBat && valVBat < upLimitValVBat ) //valTemp > 30 && 
+                            {
+                                repeatCount_2_1++;
+                                if (repeatCount_2_1 > COUNT_LIMIT_FULLCHARGED) 
+                                {
+                                    repeatCount_2_1 = 0;
+                                    systemState = FULL_CHARGED;
+                                    transientCheckFlg = 0;
+                                }
+                            }
+                            else if ( valISense < downLimitValCur ) // && valTemp < 15
+                            {
+                                repeatCount_2_3++;
+                                if (repeatCount_2_3 > COUNT_LIMIT_FULLCHARGED) {
+                                    repeatCount_2_3 = 0;
+                                    systemState = DISCONNECTED;
+                                    transientCheckFlg = 0;
+                                    //isBatteryCheckFlg = 0;
+                                    //SetPwmDuty( fullChagePwmDuty );
+                                }
+                            }
+                            else
+                            {
+                                repeatCount_2_1 = 0;
+                                repeatCount_2_3 = 0;
+                                
+                                
+                            }
+                        }
+                        
+                        dutyUpdateCnt ++;
+                            if ( dutyUpdateCnt > PWM_DUTY_CNT )
+                            {
+                                dutyUpdateCnt = 0;
+                                if( chargingModeFlg ) {
+                                    if( valVBat > overValVBat - stepValVBat - 16 ) {
+                                        SetPwmDuty( pwmDuty );
+                                    }
+                                    else{
+                                        if( valISense > initChgValCur + 15 ) SetPwmDuty( pwmDuty - 1 );
+                                        if( valISense < initChgValCur - 15 ) SetPwmDuty( pwmDuty + 1 );
+                                    }
+                                }
+                                else{
+                                    if( valVBat > overValVBat - stepValVBat ) SetPwmDuty( pwmDuty );
+                                    else if( valVBat > overValVBat - stepValVBat - 3 ) {
+                                        if( valISense > stopChgValCur + 15 ) SetPwmDuty( pwmDuty - 1 );
+                                        if( valISense < stopChgValCur - 15 ) SetPwmDuty( pwmDuty + 1 );
+                                    }
+                                    else if( valVBat > overValVBat - stepValVBat - 6 ) {
+                                        if( valISense > initChgValCur / 3 + 15 ) SetPwmDuty( pwmDuty - 1 );
+                                        if( valISense < initChgValCur / 3 - 15  ) SetPwmDuty( pwmDuty + 1 );
+                                    }
+                                    else if( valVBat > overValVBat - stepValVBat - 16 ) {
+                                        if( valISense > initChgValCur / 2 + 15 ) SetPwmDuty( pwmDuty - 1 );
+                                        if( valISense < initChgValCur / 2 - 15 ) SetPwmDuty( pwmDuty + 1 );
+                                    }
+                                    else {
+                                        if( valISense > initChgValCur + 15 ) SetPwmDuty( pwmDuty - 1 );
+                                        if( valISense < initChgValCur - 15 ) SetPwmDuty( pwmDuty + 1 );
+                                    }
+                                }
+                            }
+                        break;
+                        
+                    case DISCONNECTED:
+                      
+                        GPIO_WriteHigh(GPIOB, GPIO_PIN_4);                          // Green LED OFF
+                        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);                          // RED   LED OFF
+                        
+                        //disableInterrupts();
+                        if( !transientCheckFlg ) transientCnt ++;
+                        if( transientCnt > 60000 ) {transientCheckFlg = 1; transientCnt = 0;}
+                        if( transientCheckFlg ) {
+                        
+                            if (  valVBat > (uint16_t)underValVBat * 2 / 3 && valVBat < overValVBat - stepValVBat )  //&& valTemp > 30  valISense > downLimitValCur && valVBat < overValVBat - stepValVBat
+                            {            
+                                repeatCount_3_1++;
+                                if (repeatCount_3_1 > COUNT_LIMIT) 
+                                {
+                                    repeatCount_3_1 = 0;
+                                    systemState = CHARGING;
+                                    transientCheckFlg = 0;
+                                    //SetPwmDuty(fullChagePwmDuty);
+                                }
+                            }
+                            else if ( valVBat > overValVBat && valVBat < upLimitValVBat ) //valTemp > 30 && 
+                            {
+                                repeatCount_3_2++;
+                                if (repeatCount_3_2 > COUNT_LIMIT_FULLCHARGED) 
+                                {
+                                    repeatCount_3_2 = 0;
+                                    systemState = FULL_CHARGED; 
+                                    transientCheckFlg = 0;
+                                }
+                            }
+                            else
+                            {
+                                //SetPwmDuty( 0 );
+                                batteryCheckCnt1 ++;
+                                if( batteryCheckCnt1 > 30000 )
+                                {
+                                    batteryCheckCnt1 = 0;
+                                    disableInterrupts();
+                                    isBatteryCheckFlg = 0;
+                                }
+                                repeatCount_3_1 = 0;
+                                repeatCount_3_2 = 0;
+                            }
+                        }
+                        break;
+                        
+                    default:
+
+                        break;
+                //}
+            
+            }
+            
+            if (timer2Count >= 5000)
+            {    
+                //for (int i = 0; i < 24; i++)
+              //{
+                //UartSendInt(dataEEPROM[i]); putstring(" ");
+              //}
+                putstring("\nD ");   UartSendInt(pwmDuty);
+                putstring("\nS ");   UartSendInt(systemState);
+                putstring("\nT ");   UartSendInt(valTemp);
+                putstring("\nV ");   UartSendInt(valVBat);
+                putstring("\nI ");   UartSendInt(valISense);
+                //putstring("\nC ");   UartSendInt(isBatteryCheckFlg);
+                putstring("\n");
+                timer2Count = 0;
+            }
+        }
+    }
+}
+
+
+#ifdef USE_FULL_ASSERT
+
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *   where the assert_param error has occurred.
+  * @param file: pointer to the source file name
+  * @param line: assert_param error line source number
+  * @retval : None
+  */
+void assert_failed(u8* file, u32 line)
+{ 
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
+  /* Infinite loop */
+  while (1)
+  {
+  }
+}
+#endif
